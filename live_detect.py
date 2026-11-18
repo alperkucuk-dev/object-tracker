@@ -2,9 +2,9 @@ import cv2
 import time
 from ultralytics import YOLO
 from detector import detect
-
-
 from bounding_box import BoundingBox
+
+ALLOWED_LABELS = ["person", "bicycle", "car", "motorcycle", "bus", "truck"]
 
 cap = cv2.VideoCapture(0)
 
@@ -20,7 +20,7 @@ while True:
         print("Frame couldn't be read")
         break
 
-    detections = detect(model,frame)
+    detections = detect(model,frame, allowed_labels=ALLOWED_LABELS)
     pres_time = time.time()
     duration = pres_time - prev_time
     fps = 1 / duration
