@@ -2,7 +2,7 @@ from bounding_box import BoundingBox
 
 def detect(model, frame):
     detections = []
-    results = model(frame) 
+    results = model(frame, verbose = False) 
 
     result = results[0]
 
