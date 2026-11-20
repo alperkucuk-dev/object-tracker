@@ -39,7 +39,16 @@ while True:
 
     cv2.putText(frame,f"FPS: {fps:.1f}",(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 
                 0.8, (255, 0, 0), 1)
+
+    y = 60
+
+    for label, count in tracker.counts.items():
+        cv2.putText(frame,f"{label}: {count}",(10, y), cv2.FONT_HERSHEY_SIMPLEX, 
+                0.8, (0, 255, 0), 1)
+        y += 30
+    
     cv2.imshow("Webcam", frame)
+
 
     
 

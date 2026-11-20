@@ -5,6 +5,7 @@ class Track:
         self.ID = ID
         self.bbox = bbox
         self.missed_frames = 0  
+        
 
     def update(self, new_box):
         self.bbox =  new_box
@@ -17,6 +18,7 @@ class Tracker:
         self.max_missed_frames = max_missed_frames        
         self.tracks = []
         self.next_ID = 1 
+        self.counts = {}
 
     def update(self, detections):
         matched_tracks = []
@@ -46,6 +48,10 @@ class Tracker:
                 new_track = Track(self.next_ID, box)
                 self.next_ID += 1
                 new_tracks.append(new_track)
+                if new_track.bbox.label in self.counts:
+                    self.counts[new_track.bbox.label] += 1
+                else:
+                    self.counts[new_track.bbox.label] = 1
 
         for track in self.tracks:
             if track not in matched_tracks:
@@ -99,7 +105,7 @@ if __name__ == "__main__":
     ]
     tracker.update(frame3)
     print_tracks(3, tracker)
-    
+
     for frame_no in range(4, 16):
         x = 120 + (frame_no - 3) * 5
         tracker.update([BoundingBox(x, 100, x + 100, 300, "person")])
