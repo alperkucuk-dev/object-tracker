@@ -2,7 +2,7 @@ import cv2
 import time
 from ultralytics import YOLO
 from detector import detect
-from bounding_box import BoundingBox
+from tracker import Tracker
 
 ALLOWED_LABELS = ["person", "bicycle", "car", "motorcycle", "bus", "truck"]
 
@@ -11,6 +11,9 @@ cap = cv2.VideoCapture(0)
 prev_time = time.time()
 
 model = YOLO("yolo26n.pt")
+
+tracker = Tracker()
+
 
 while True:
 
@@ -21,15 +24,17 @@ while True:
         break
 
     detections = detect(model,frame, allowed_labels=ALLOWED_LABELS)
+    tracks = tracker.update(detections)
     pres_time = time.time()
     duration = pres_time - prev_time
     fps = 1 / duration
     prev_time = pres_time
 
-    for box in detections:
-        cv2.rectangle(frame, (box.x1,box.y1), (box.x2, box.y2), (0, 255, 0), 2)
-        cv2.putText(frame,f"{box.label} conf: {box.confidence:.2f}", (box.x1, box.y1-10), cv2.FONT_HERSHEY_SIMPLEX, 
-                0.8, (0, 0, 255), 2)
+    for track in tracks:
+        if track.missed_frames == 0:
+            cv2.rectangle(frame, (track.bbox.x1,track.bbox.y1), (track.bbox.x2, track.bbox.y2), (0, 255, 0), 2)
+            cv2.putText(frame,f"{track.bbox.label}, ID: {track.ID}, conf: {track.bbox.confidence:.2f}", 
+                        (track.bbox.x1, track.bbox.y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
       
 
     cv2.putText(frame,f"FPS: {fps:.1f}",(10, 30), cv2.FONT_HERSHEY_SIMPLEX, 
