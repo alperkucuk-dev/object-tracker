@@ -30,7 +30,7 @@ class BoundingBox:
         top_y = min(self.y2,other.y2)
         right_x = min(self.x2,other.x2)
 
-        intersection_area = max((right_x - left_x),0) * max(0,(up_y - down_y))
+        intersection_area = max((right_x - left_x),0) * max(0,(top_y - bottom_y))
         union_area = self.area() + other.area() - intersection_area
 
         IoU = intersection_area / union_area

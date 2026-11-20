@@ -19,12 +19,17 @@ class Tracker:
         self.next_ID = 1 
 
     def update(self, detections):
-        
+        matched_tracks = []
+        new_tracks = []
+
         for box in detections:
             best_track = None
             best_iou = 0
             for track in self.tracks:
                 if track.bbox.label != box.label:
+                    continue
+
+                if track in matched_tracks:
                     continue
                
                 var_iou = track.bbox.iou(box)
@@ -34,7 +39,16 @@ class Tracker:
 
             if(best_iou >= self.min_iou):
                 best_track.update(box)
-                        
+                matched_tracks.append(best_track)
+
+            else:
+                new_track = Track(self.next_ID, box)
+                self.next_ID += 1
+                new_tracks.append(new_track)
+
+        for new_track in new_tracks:
+            self.tracks.append(new_track)   
+
             
 
 
@@ -45,14 +59,32 @@ class Tracker:
 
 
 if __name__ == "__main__":
-    box = BoundingBox(10,20,30,40,"person")
-    box2 = BoundingBox(30,40,20,40,"car")   
+    
+    def print_tracks(frame_no, tracker):
+        print(f"--- Frame {frame_no} ---")
+        for track in tracker.tracks:
+            print(f"#{track.ID} {track.bbox.label} "
+                  f"x1={track.bbox.x1} missed={track.missed_frames}")
 
-    track_object = Track(20,box)
-    print(track_object.bbox.label, track_object.ID)
+    tracker = Tracker()
 
-    track_object.update(box2)
-    print(track_object.bbox.label, track_object.ID)
+    
+    frame1 = [BoundingBox(100, 100, 200, 300, "person")]
+    tracker.update(frame1)
+    print_tracks(1, tracker)
+
+    
+    frame2 = [BoundingBox(110, 100, 210, 300, "person")]
+    tracker.update(frame2)
+    print_tracks(2, tracker)
+
+   
+    frame3 = [
+        BoundingBox(120, 100, 220, 300, "person"),
+        BoundingBox(400, 100, 500, 300, "person"),
+    ]
+    tracker.update(frame3)
+    print_tracks(3, tracker)
     
 
     
