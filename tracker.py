@@ -21,6 +21,7 @@ class Tracker:
     def update(self, detections):
         matched_tracks = []
         new_tracks = []
+        remaining_tracks = []
 
         for box in detections:
             best_track = None
@@ -46,8 +47,21 @@ class Tracker:
                 self.next_ID += 1
                 new_tracks.append(new_track)
 
+        for track in self.tracks:
+            if track not in matched_tracks:
+                track.missed_frames += 1
+
+            if track.missed_frames > self.max_missed_frames:
+                continue
+
+            remaining_tracks.append(track)
+            
+        self.tracks = remaining_tracks
+
         for new_track in new_tracks:
             self.tracks.append(new_track)   
+       
+        return self.tracks
 
             
 
@@ -85,6 +99,11 @@ if __name__ == "__main__":
     ]
     tracker.update(frame3)
     print_tracks(3, tracker)
+    
+    for frame_no in range(4, 16):
+        x = 120 + (frame_no - 3) * 5
+        tracker.update([BoundingBox(x, 100, x + 100, 300, "person")])
+        print_tracks(frame_no, tracker)
     
 
     
