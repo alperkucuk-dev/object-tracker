@@ -9,6 +9,15 @@ VIDEO_SOURCE = "videos/traffic.mp4"
 
 cap = cv2.VideoCapture(VIDEO_SOURCE)
 
+video_fps = cap.get(cv2.CAP_PROP_FPS)
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+writer = cv2.VideoWriter("videos/output.mp4", fourcc, video_fps,(width,height))
+print("Writer opened:", writer.isOpened())
+
+
 prev_time = time.time()
 
 model = YOLO("yolo26n.pt")
@@ -49,6 +58,7 @@ while True:
         y += 30
     
     cv2.imshow("Webcam", frame)
+    writer.write(frame)
 
 
     
@@ -57,4 +67,5 @@ while True:
         break
 
 cap.release()
+writer.release()
 cv2.destroyAllWindows()
