@@ -15,7 +15,6 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 writer = cv2.VideoWriter("videos/output.mp4", fourcc, video_fps,(width,height))
-print("Writer opened:", writer.isOpened())
 
 
 prev_time = time.time()
@@ -30,7 +29,7 @@ while True:
     ret, frame = cap.read()
 
     if not ret:
-        print("Frame couldn't be read")
+        print("Video finished")
         break
 
     detections = detect(model,frame, allowed_labels=ALLOWED_LABELS, min_confidence=0.3)
@@ -57,7 +56,7 @@ while True:
                 0.8, (0, 255, 0), 1)
         y += 30
     
-    cv2.imshow("Webcam", frame)
+    cv2.imshow("Object Tracker", frame)
     writer.write(frame)
 
 
